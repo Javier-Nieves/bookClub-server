@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 // const validator = require('validator');
-// const bcrypt = require('bcryptjs');
 // const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Username is required"],
-    minlength: [5, "Username should be at least 5 characters long"],
+    minlength: [2, "Username should be at least 2 characters long"],
     maxlength: [20, "Username is too long!"],
   },
   // email: {
@@ -17,21 +17,21 @@ const userSchema = new mongoose.Schema({
   //   lowercase: true,
   //   validate: validator.isEmail,
   // },
-  // password: {
-  //   type: String,
-  //   required: true,
-  //   minlength: [8, 'Password should be at least 8 characters long'],
-  // },
-  // passwordConfirm: {
-  //   type: String,
-  //   required: true,
-  //   validate: {
-  //     validator: function (el) {
-  //       return el === this.password;
-  //     },
-  //     message: 'Password and validation do not match.',
-  //   },
-  // },
+  password: {
+    type: String,
+    required: true,
+    minlength: [8, "Password should be at least 8 characters long"],
+  },
+  passwordConfirm: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Password and validation do not match.",
+    },
+  },
   // passwordChangedAt: Date,
   // passwordResetToken: String,
   // passwordResetExpires: Date,
@@ -52,19 +52,19 @@ const userSchema = new mongoose.Schema({
 //   },
 // });
 
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   this.password = await bcrypt.hash(this.password, 12);
-//   this.passwordConfirm = undefined;
-//   next();
-// });
+userSchema.pre("save", async function (next) {
+  // if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
+});
 
-// userSchema.methods.correctPassword = async function (
-//   candidatePassword,
-//   userPassword
-// ) {
-//   return await bcrypt.compare(candidatePassword, userPassword);
-// };
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model("User", userSchema);
 
