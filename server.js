@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 
 const Book = require("./models/bookModel");
 
@@ -14,6 +15,7 @@ app.use(express.static("public"));
 app.use("/", basicRouter);
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3001");

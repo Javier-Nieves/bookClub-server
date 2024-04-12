@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
 const User = require("../models/userModel");
 const catchAsync = require("../catchAsync");
 
@@ -17,6 +18,7 @@ const createSendToken = (user, statusCode, res) => {
   };
   user.password = undefined;
   res.cookie("jwt", token, cookieOptions);
+  console.log("sending cookie", token);
   res.status(statusCode).json({ status: "success", token, data: { user } });
 };
 
@@ -26,7 +28,6 @@ exports.getAll = catchAsync(async (req, res) => {
 });
 
 exports.signup = catchAsync(async (req, res, next) => {
-  console.log("body: ", req.body);
   try {
     const newUser = await User.create({
       name: req.body.name.toLowerCase(),
@@ -41,18 +42,56 @@ exports.signup = catchAsync(async (req, res, next) => {
   }
 });
 
-// exports.login = catchAsync(async (req, res, next) => {
-//   const { email, password } = req.body;
-//   if (!email || !password)
-//     return next(new AppError("Please provide email and password", 400));
+exports.isLoggedIn = async (req, res, next) => {
+  console.log("someone is checking..");
+  console.log("cookie check:", req.cookies.jwt);
+  // no jwt cookie === not logged in
+  if (!req.cookies.jwt)
+    return res.status(200).json({
+      status: "fail",
+      message: "isn't logged in",
+    });
+  try {
+    // verify token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
 
-//   const user = await User.findOne({ email }).select("+password");
-//   if (!user || !(await user.correctPassword(password, user.password)))
-//     return next(new AppError("Please enter valid email and password", 400));
+    // check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) return next();
+    // There is a logged in user
+    // locals - is a place, to which all templates have access
+    res.locals.user = currentUser;
 
-//   // login user
-//   createSendToken(user, 200, res);
-// });
+    res.status(200).json({
+      status: "success",
+      message: "user logged in",
+      //   data: { currentUser },
+    });
+  } catch (error) {
+    console.log("catch error", error);
+    res.status(205).json({
+      status: "fail",
+      message: "isn't logged in",
+    });
+  }
+};
+
+exports.login = catchAsync(async (req, res, next) => {
+  const { name, password } = req.body;
+  if (!name || !password) return next(new Error("no name or password"));
+  // return next(new AppError("Please provide email and password", 400));
+
+  const user = await User.findOne({ name }).select("+password");
+  if (!user || !(await user.correctPassword(password, user.password)))
+    return next(new Error("Incorrect password"));
+  // return next(new AppError("Please enter valid email and password", 400));
+
+  // login user
+  createSendToken(user, 200, res);
+});
 
 // exports.logout = (req, res) => {
 //   res.cookie("jwt", "randomText", {
