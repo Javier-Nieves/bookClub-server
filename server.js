@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const Book = require("./models/bookModel");
@@ -12,19 +13,20 @@ const userRouter = require("./routes/userRoutes");
 const app = express();
 
 app.use(express.static("public"));
+app.use(cors());
 app.use("/", basicRouter);
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3001");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// app.use(function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:3001");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 
 // ROUTES:
 app.use("/api/v1/books", bookRouter);

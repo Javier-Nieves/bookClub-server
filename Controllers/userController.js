@@ -72,7 +72,7 @@ exports.isLoggedIn = async (req, res, next) => {
     });
   } catch (error) {
     console.log("catch error", error);
-    res.status(205).json({
+    res.status(403).json({
       status: "fail",
       message: "isn't logged in",
     });
