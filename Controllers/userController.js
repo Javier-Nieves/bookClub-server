@@ -43,10 +43,14 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.isLoggedIn = async (req, res, next) => {
+  const { token } = req.body;
   console.log("someone is checking..");
-  console.log("cookie check:", req.cookies.jwt);
+  console.log("token check:", token);
+  // console.log("cookie check:", req.cookies.jwt);
+
   // no jwt cookie === not logged in
-  if (!req.cookies.jwt)
+  // if (!req.cookies.jwt)
+  if (!token)
     return res.status(200).json({
       status: "fail",
       message: "isn't logged in",
@@ -54,7 +58,8 @@ exports.isLoggedIn = async (req, res, next) => {
   try {
     // verify token
     const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
+      // req.cookies.jwt,
+      token,
       process.env.JWT_SECRET
     );
 
@@ -68,7 +73,7 @@ exports.isLoggedIn = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "user logged in",
-      //   data: { currentUser },
+      data: { currentUser },
     });
   } catch (error) {
     console.log("catch error", error);
