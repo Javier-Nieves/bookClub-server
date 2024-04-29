@@ -1,4 +1,5 @@
 const Book = require("../models/bookModel");
+const User = require("../models/userModel");
 
 exports.getEverything = async function (req, res) {
   const books = await Book.find();
@@ -6,12 +7,15 @@ exports.getEverything = async function (req, res) {
 };
 
 exports.getAll = async function (req, res) {
-  const books = await Book.find({ club: req.params.userId });
+  const club = await User.findById(req.params.userId);
+  const books = await Book.find({ club });
   res.status(200).json({ status: "success", data: { books } });
 };
 
 exports.createBook = async function (req, res) {
-  const newBook = await Book.create(req.body);
+  const club = await User.findById(req.body.club);
+  const newBookObject = { ...req.body, club };
+  const newBook = await Book.create(newBookObject);
   res.status(200).json({ status: "success", data: { newBook } });
 };
 
