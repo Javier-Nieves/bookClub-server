@@ -10,6 +10,9 @@ router
 
 router.route("/all/:userId").get(bookController.getAll);
 
-router.route("/:id").patch(bookController.changeBook);
+router
+  .route("/:id")
+  .patch(bookController.changeBook)
+  .delete(bookController.deleteBook);
 
 module.exports = router;

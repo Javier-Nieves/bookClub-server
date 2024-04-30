@@ -30,3 +30,14 @@ exports.changeBook = async function (req, res) {
     res.status(304).json({ status: "fail", message: "Failed to update book" });
   }
 };
+
+exports.deleteBook = async function (req, res, next) {
+  try {
+    // const book = await Book.findOneAndDelete({ bookid: req.params.id });
+    const book = await Book.findByIdAndDelete(req.params.id);
+    if (!book) throw new Error("No document found with that ID", 404);
+    res.status(202).json({ status: "success", data: null });
+  } catch {
+    res.status(304).json({ status: "fail", message: "Failed to delete book" });
+  }
+};
