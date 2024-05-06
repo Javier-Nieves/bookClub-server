@@ -7,6 +7,7 @@ exports.getEverything = async function (req, res) {
 };
 
 exports.getAll = async function (req, res) {
+  console.log("getting all books for", req.params.userId);
   const club = await User.findById(req.params.userId);
   const books = await Book.find({ club });
   res.status(200).json({ status: "success", data: { books } });

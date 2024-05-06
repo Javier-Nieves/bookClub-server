@@ -9,6 +9,7 @@ const signToken = (id) =>
   });
 
 const createSendToken = (user, statusCode, res) => {
+  // console.log("Creating token for 😎: ", user._id);
   const token = signToken(user._id);
   const cookieOptions = {
     expires: new Date(
@@ -17,8 +18,9 @@ const createSendToken = (user, statusCode, res) => {
     httpOnly: true,
   };
   user.password = undefined;
+  // sending JWT as a cookie as well
   res.cookie("jwt", token, cookieOptions);
-  console.log("sending cookie", token);
+  // console.log("sending JWT ⭐️", token);
   res.status(statusCode).json({ status: "success", token, data: { user } });
 };
 
@@ -44,7 +46,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.isLoggedIn = async (req, res, next) => {
   const { token } = req.body;
-  console.log("someone is checking..");
+  let currentUser;
   console.log("token check:", token);
   // console.log("cookie check:", req.cookies.jwt);
 
@@ -64,19 +66,21 @@ exports.isLoggedIn = async (req, res, next) => {
     );
 
     // check if user still exists
-    const currentUser = await User.findById(decoded.id);
+    if (decoded.id.match(/^[0-9a-fA-F]{24}$/))
+      currentUser = await User.findById(decoded.id);
+
     if (!currentUser) return next();
     // There is a logged in user
     // locals - is a place, to which all templates have access
     res.locals.user = currentUser;
-
+    // console.log("token ok 👌");
     res.status(200).json({
       status: "success",
       message: "user logged in",
       data: { currentUser },
     });
   } catch (error) {
-    console.log("catch error", error);
+    console.log("error:", error);
     res.status(403).json({
       status: "fail",
       message: "isn't logged in",
@@ -85,14 +89,14 @@ exports.isLoggedIn = async (req, res, next) => {
 };
 
 exports.login = catchAsync(async (req, res, next) => {
+  // console.log("Login attempt", req.body.name);
   const { name, password } = req.body;
   if (!name || !password) return next(new Error("no name or password"));
-  // return next(new AppError("Please provide email and password", 400));
 
   const user = await User.findOne({ name }).select("+password");
+  // console.log("user 😎: ", user);
   if (!user || !(await user.correctPassword(password, user.password)))
     return next(new Error("Incorrect password"));
-  // return next(new AppError("Please enter valid email and password", 400));
 
   // login user
   createSendToken(user, 200, res);

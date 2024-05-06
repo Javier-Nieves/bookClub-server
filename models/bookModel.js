@@ -30,7 +30,7 @@ const bookSchema = new mongoose.Schema({
   country: {
     type: String,
     required: [true, "A book must have a country"],
-    maxlength: [20, "A book country must have max 20 characters"],
+    maxlength: [50, "A book country must have max 50 characters"],
     minlength: [2, "A book country must have more or equal then 2 characters"],
   },
   pages: {
