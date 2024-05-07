@@ -4,7 +4,6 @@ const bookSchema = new mongoose.Schema({
   bookid: {
     type: String,
     required: [true, "A book must have an ID"],
-    unique: true,
   },
   club: [
     {
@@ -15,7 +14,6 @@ const bookSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "A book must have a title"],
-    unique: true,
     trim: true,
     maxlength: [
       200,
