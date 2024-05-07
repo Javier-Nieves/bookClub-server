@@ -19,14 +19,14 @@ app.use("/", basicRouter);
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-// app.use(function (req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "http://localhost:3001");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept"
-//   );
-//   next();
-// });
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 // ROUTES:
 app.use("/api/v1/books", bookRouter);
@@ -45,8 +45,9 @@ mongoose.connect(DB).then(() => {
   // console.log("Data inserted!");
 });
 
-const server = app.listen(3000, () => {
-  console.log(`App running on port 3000...`);
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`App running on port ${port}...`);
 });
 
 process.on("unhandledRejection", (err) => {

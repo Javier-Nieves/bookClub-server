@@ -9,7 +9,7 @@ const signToken = (id) =>
   });
 
 const createSendToken = (user, statusCode, res) => {
-  // console.log("Creating token for 😎: ", user._id);
+  console.log("Creating token for 😎: ", user._id);
   const token = signToken(user._id);
   const cookieOptions = {
     expires: new Date(
@@ -20,7 +20,7 @@ const createSendToken = (user, statusCode, res) => {
   user.password = undefined;
   // sending JWT as a cookie as well
   res.cookie("jwt", token, cookieOptions);
-  // console.log("sending JWT ⭐️", token);
+  console.log("sending JWT ⭐️", token);
   res.status(statusCode).json({ status: "success", token, data: { user } });
 };
 

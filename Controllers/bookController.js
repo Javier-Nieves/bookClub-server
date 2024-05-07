@@ -2,6 +2,7 @@ const Book = require("../models/bookModel");
 const User = require("../models/userModel");
 
 exports.getEverything = async function (req, res) {
+  console.log("getting all books");
   const books = await Book.find();
   res.status(200).json({ status: "success", data: { books } });
 };
