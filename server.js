@@ -19,14 +19,18 @@ app.use("/", basicRouter);
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// List of allowed origins
+const allowedOrigins = [
+  "https://wave-bookclub-react.vercel.app/",
+  "http://localhost:5173/",
+];
+
+// Configure CORS middleware with allowed origins
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
 
 // ROUTES:
 app.use("/api/v1/books", bookRouter);

@@ -23,8 +23,9 @@ exports.createBook = async function (req, res) {
 
 exports.changeBook = async function (req, res) {
   try {
+    const club = await User.findById(req.body.club);
     // prettier-ignore
-    const book = await Book.findOneAndUpdate({ bookid: req.params.id }, req.body, {
+    const book = await Book.findOneAndUpdate({ club: club, bookid: req.params.id }, req.body, {
       new: true,
     });
     res.status(202).json({ status: "success", data: { book } });
