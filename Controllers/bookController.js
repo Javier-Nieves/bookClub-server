@@ -8,13 +8,24 @@ exports.getEverything = async function (req, res) {
 };
 
 exports.getAll = async function (req, res) {
-  console.log("getting all books for", req.params.userId);
-  const club = await User.findById(req.params.userId);
-  const books = await Book.find({ club });
-  res.status(200).json({ status: "success", data: { books } });
+  // console.log("getting all books for", req.params.userId);
+  if (!req.params.userId || req.params.userId === "undefined")
+    // prettier-ignore
+    return res.status(403).json({ status: "fail", message: "Undefined user, try again" });
+  try {
+    const club = await User.findById(req.params.userId);
+    const books = await Book.find({ club });
+    return res.status(200).json({ status: "success", data: { books } });
+  } catch {
+    return res.status(403).json({
+      status: "fail",
+      message: `Can't load books for ${req.params.userId}`,
+    });
+  }
 };
 
 exports.createBook = async function (req, res) {
+  console.log("adding book for", req.body.club);
   const club = await User.findById(req.body.club);
   const newBookObject = { ...req.body, club };
   const newBook = await Book.create(newBookObject);
@@ -23,9 +34,8 @@ exports.createBook = async function (req, res) {
 
 exports.changeBook = async function (req, res) {
   try {
-    const club = await User.findById(req.body.club);
     // prettier-ignore
-    const book = await Book.findOneAndUpdate({ club: club, bookid: req.params.id }, req.body, {
+    const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
     res.status(202).json({ status: "success", data: { book } });
