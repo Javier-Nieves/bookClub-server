@@ -1,8 +1,9 @@
 const Book = require("../models/bookModel");
 const User = require("../models/userModel");
+const testBooks = require("../testBooks");
 
 exports.getEverything = async function (req, res) {
-  console.log("getting all books");
+  // console.log("getting all books");
   const books = await Book.find();
   res.status(200).json({ status: "success", data: { books } });
 };
@@ -29,10 +30,12 @@ exports.createBook = async function (req, res) {
   const club = await User.findById(req.body.club);
   const newBookObject = { ...req.body, club };
   const newBook = await Book.create(newBookObject);
+  // console.log(newBook);
   res.status(200).json({ status: "success", data: { newBook } });
 };
 
 exports.changeBook = async function (req, res) {
+  // console.log("changing:", req.params.id, req.body);
   try {
     // prettier-ignore
     const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
@@ -52,5 +55,21 @@ exports.deleteBook = async function (req, res, next) {
     res.status(202).json({ status: "success", data: null });
   } catch {
     res.status(304).json({ status: "fail", message: "Failed to delete book" });
+  }
+};
+
+exports.insertData = async function (req, res, next) {
+  try {
+    // Delete all previous data of Test club
+    const club = await User.findById("66754a55d072377eaa0154f6");
+    if (club) await Book.deleteMany({ club });
+    else console.error("Club not found");
+
+    // Insert data into the 'books' collection
+    const result = await Book.insertMany(testBooks);
+
+    console.log(`${result.length} documents inserted`);
+  } catch (error) {
+    console.error("Error inserting data:", error);
   }
 };

@@ -15,4 +15,6 @@ router
   .patch(bookController.changeBook)
   .delete(bookController.deleteBook);
 
+router.route("/uploadTestBooks").get(bookController.insertData);
+
 module.exports = router;
